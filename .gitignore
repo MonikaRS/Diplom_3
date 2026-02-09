@@ -1,0 +1,41 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Allure
+allure-results/
+allure-report/
+
+# Dependencies (если не используем Maven)
+lib/
+build/
+
+# Драйверы (если они большие)
+drivers/chromedriver
+drivers/yandexdriver
+
+# Временные файлы
+*.tmp
+*.temp
+
+# Системные файлы
+*.swp
+*.swo
+*~
+.allure/
