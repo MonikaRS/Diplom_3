@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Stellar Burgers - UI Тесты" parallel="tests" thread-count="2">
+    
+    <!-- Тесты в Chrome -->
+    <test name="Chrome Tests">
+        <parameter name="browser" value="chrome"/>
+        <classes>
+            <class name="tests.ui.UserRegistrationUITests"/>
+            <class name="tests.ui.UserLoginUITests"/>
+            <class name="tests.ui.OrderCreationUITests"/>
+        </classes>
+    </test>
+    
+    <!-- Тесты в Яндекс Браузере -->
+    <test name="Yandex Tests">
+        <parameter name="browser" value="yandex"/>
+        <classes>
+            <class name="tests.ui.UserRegistrationUITests"/>
+            <class name="tests.ui.UserLoginUITests"/>
+            <class name="tests.ui.OrderCreationUITests"/>
+        </classes>
+    </test>
+    
+</suite>

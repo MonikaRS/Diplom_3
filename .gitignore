@@ -1,0 +1,27 @@
+# GitHub Actions
+.github/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.metadata/
+
+# Build
+target/
+build/
+out/
+
+# Logs
+*.log
+
+# Test reports
+allure-results/
+allure-report/
+test-output/
+
+# Docs
+docs/
