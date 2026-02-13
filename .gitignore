@@ -19,9 +19,9 @@ out/
 *.log
 
 # Test reports
-test-output/
 allure-results/
 allure-report/
+test-output/
 
-# Drivers
-drivers/
+# Docs
+docs/
