@@ -1,33 +1,26 @@
 package com.stellar.burgers.pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 @SuppressWarnings("unused")
-public class LoginPage {
-    private final WebDriver driver;
+public class LoginPage extends BasePage {
+    private static final String URL = "https://stellarburgers.education-services.ru/login";
 
-    public LoginPage(WebDriver driver) {
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-    }
-
-    // ========== Локаторы элементов ==========
-
-    // Поля формы (ИСПРАВЛЕНО)
-    @FindBy(xpath = "//input[@type='text' and @name='name']")
+    // ⚠️ БАГ ФРОНТЕНДА #2: поле Email имеет name="name" вместо name="email"
+    // Баг заведён 13.02.2026 в BUGS.md
+    // Используем обходной селектор по label
+    @FindBy(xpath = "//label[text()='Email']/following-sibling::input")
     private WebElement emailField;
 
-    @FindBy(xpath = "//input[@type='password']")
+    // ⚠️ БАГ ФРОНТЕНДА #3: поле Пароль имеет name="Пароль" (русские буквы!)
+    // Баг заведён 13.02.2026 в BUGS.md
+    // Используем обходной селектор по label
+    @FindBy(xpath = "//label[text()='Пароль']/following-sibling::input")
     private WebElement passwordField;
 
-    // Кнопки и ссылки
     @FindBy(xpath = "//button[text()='Войти']")
     private WebElement loginButton;
 
@@ -37,97 +30,77 @@ public class LoginPage {
     @FindBy(xpath = "//a[text()='Восстановить пароль']")
     private WebElement forgotPasswordLink;
 
-    // Заголовок страницы
     @FindBy(xpath = "//h2[text()='Вход']")
     private WebElement loginTitle;
 
-    // ========== Основные методы ==========
+    public LoginPage(WebDriver driver) {
+        super(driver);
+    }
 
-    /**
-     * Открыть страницу входа
-     */
+    @Override
+    @Step("Ожидание загрузки страницы входа")
+    public void waitForPageLoad() {
+        waitForVisibility(loginTitle);
+        waitForVisibility(emailField);
+    }
+
+    @Step("Открытие страницы входа")
     public void open() {
-        driver.get("https://stellarburgers.education-services.ru/login");
+        driver.get(URL);
         waitForPageLoad();
     }
 
-    /**
-     * Заполнить поле "Email"
-     */
+    @Step("Ввод email: {email}")
     public void setEmail(String email) {
-        waitForElement(emailField).clear();
+        waitForVisibility(emailField);
+        emailField.clear();
         emailField.sendKeys(email);
+        System.out.println("   ✅ Email введен: " + email);
     }
 
-    /**
-     * Заполнить поле "Пароль"
-     */
+    @Step("Ввод пароля")
     public void setPassword(String password) {
-        waitForElement(passwordField).clear();
+        waitForVisibility(passwordField);
+        passwordField.clear();
         passwordField.sendKeys(password);
+        System.out.println("   ✅ Пароль введен");
     }
 
-    /**
-     * Нажать кнопку "Войти"
-     */
+    @Step("Клик по кнопке 'Войти'")
     public void clickLoginButton() {
-        waitForElement(loginButton).click();
+        waitForClickable(loginButton);
+        loginButton.click();
+        System.out.println("   ✅ Кнопка 'Войти' нажата");
     }
 
-    /**
-     * Нажать ссылку "Зарегистрироваться"
-     */
-    public void clickRegisterLink() {
-        waitForElement(registerLink).click();
-    }
-
-    /**
-     * Нажать ссылку "Восстановить пароль"
-     */
-    public void clickForgotPasswordLink() {
-        waitForElement(forgotPasswordLink).click();
-    }
-
-    /**
-     * Полный вход пользователя
-     * @param email Email пользователя
-     * @param password Пароль пользователя
-     */
+    @Step("Авторизация пользователя")
     public void login(String email, String password) {
+        System.out.println("   🔐 Попытка входа: " + email);
         setEmail(email);
         setPassword(password);
         clickLoginButton();
     }
 
-    // ========== Проверки состояния ==========
+    @Step("Клик по ссылке 'Зарегистрироваться'")
+    public void clickRegisterLink() {
+        waitForClickable(registerLink);
+        registerLink.click();
+    }
 
-    /**
-     * Проверить, что страница входа открыта
-     * @return true если страница входа открыта
-     */
-    public boolean isLoginPageOpen() {
+    @Step("Клик по ссылке 'Восстановить пароль'")
+    public void clickForgotPasswordLink() {
+        waitForClickable(forgotPasswordLink);
+        forgotPasswordLink.click();
+    }
+
+    @Step("Проверка открытия страницы входа")
+    public boolean isPageOpen() {
         try {
-            return loginTitle.isDisplayed();
+            waitForVisibility(loginTitle);
+            waitForVisibility(emailField);
+            return loginTitle.isDisplayed() && emailField.isDisplayed();
         } catch (Exception e) {
             return false;
         }
-    }
-
-    // ========== Вспомогательные методы ==========
-
-    /**
-     * Ожидание элемента
-     */
-    private WebElement waitForElement(WebElement element) {
-        return new WebDriverWait(driver, Duration.ofSeconds(30))
-                .until(ExpectedConditions.elementToBeClickable(element));
-    }
-
-    /**
-     * Ожидание загрузки страницы входа
-     */
-    public void waitForPageLoad() {
-        new WebDriverWait(driver, Duration.ofSeconds(30))
-                .until(ExpectedConditions.visibilityOf(loginTitle));
     }
 }

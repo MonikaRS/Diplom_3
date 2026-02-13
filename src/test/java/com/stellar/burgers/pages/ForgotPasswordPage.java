@@ -1,24 +1,17 @@
 package com.stellar.burgers.pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 @SuppressWarnings("unused")
-public class ForgotPasswordPage {
-    private final WebDriver driver;
+public class ForgotPasswordPage extends BasePage {
+    private static final String URL = "https://stellarburgers.education-services.ru/forgot-password";
 
-    public ForgotPasswordPage(WebDriver driver) {
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-    }
-
-    @FindBy(xpath = "//input[@type='email']")
+    // ⚠️ БАГ ФРОНТЕНДА: поле Email имеет name="name" вместо name="email"
+    // Используем обходной селектор по label
+    @FindBy(xpath = "//label[text()='Email']/following-sibling::input")
     private WebElement emailField;
 
     @FindBy(xpath = "//button[text()='Восстановить']")
@@ -30,41 +23,49 @@ public class ForgotPasswordPage {
     @FindBy(xpath = "//h2[text()='Восстановление пароля']")
     private WebElement passwordRestoreTitle;
 
-    public void open() {
-        driver.get("https://stellarburgers.education-services.ru/forgot-password");
+    public ForgotPasswordPage(WebDriver driver) {
+        super(driver);
     }
 
-    // ДОБАВИТЬ ЭТОТ МЕТОД
+    @Override
+    @Step("Ожидание загрузки страницы восстановления пароля")
     public void waitForPageLoad() {
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.visibilityOf(passwordRestoreTitle));
+        waitForVisibility(passwordRestoreTitle);
+        waitForVisibility(emailField);
     }
 
+    @Step("Открытие страницы восстановления пароля")
+    public void open() {
+        driver.get(URL);
+        waitForPageLoad();
+    }
+
+    @Step("Ввод email: {email}")
     public void setEmail(String email) {
-        waitForElement(emailField).clear();
-        waitForElement(emailField).sendKeys(email);
+        waitForVisibility(emailField);
+        emailField.sendKeys(email);
     }
 
+    @Step("Клик по кнопке 'Восстановить'")
     public void clickRestoreButton() {
-        waitForElement(restoreButton).click();
+        waitForClickable(restoreButton);
+        restoreButton.click();
     }
 
+    @Step("Клик по ссылке 'Войти'")
     public void clickLoginLink() {
-        waitForElement(loginLink).click();
+        waitForClickable(loginLink);
+        loginLink.click();
     }
 
-    public boolean isPasswordRestorePageOpen() {
+    @Step("Проверка открытия страницы восстановления пароля")
+    public boolean isPageOpen() {
         try {
-            new WebDriverWait(driver, Duration.ofSeconds(15))
-                    .until(ExpectedConditions.visibilityOf(passwordRestoreTitle));
-            return passwordRestoreTitle.isDisplayed();
+            waitForVisibility(passwordRestoreTitle);
+            waitForVisibility(emailField);
+            return passwordRestoreTitle.isDisplayed() && emailField.isDisplayed();
         } catch (Exception e) {
             return false;
         }
-    }
-
-    private WebElement waitForElement(WebElement element) {
-        return new WebDriverWait(driver, Duration.ofSeconds(30))
-                .until(ExpectedConditions.visibilityOf(element));
     }
 }
